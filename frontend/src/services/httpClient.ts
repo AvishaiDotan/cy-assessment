@@ -1,18 +1,34 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-// import * as dotenv from 'dotenv';
 
-// dotenv.config();
+// Choose API URL based on environment
+let apiUrl: string;
+if (import.meta.env.MODE === 'production') {
+  // In production mode, use port 3001
+  apiUrl = 'http://localhost:3001';
+} else {
+  // In development mode, use port 3000
+  apiUrl = 'http://localhost:3000';
+}
+
+console.log('Environment:', import.meta.env.MODE);
+console.log('API URL:', apiUrl);
 
 class HttpClient {
   private client: AxiosInstance;
 
   constructor() {
     this.client = axios.create({
-      baseURL: 'http://localhost:3000',
+      baseURL: apiUrl,
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
       },
+    });
+    
+    // Add request interceptor to log URLs
+    this.client.interceptors.request.use(config => {
+      console.log('Making request to:', (config.baseURL || '') + (config.url || ''));
+      return config;
     });
   }
 

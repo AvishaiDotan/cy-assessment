@@ -1,57 +1,55 @@
 version: '3.8'
 
 services:
-  # Shared library build container - this is just for building, not a running service
-  shared-lib:
-    build:
-      context: ./shared-lib
-      dockerfile: Dockerfile
-    image: shared-lib:latest
-    # This container doesn't need to keep running
-    command: "echo 'Shared library built successfully'"
-    
   # Frontend application
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    depends_on:
-      - shared-lib
+      args:
+        - NODE_ENV=production
     ports:
       - "5000:5000"
     environment:
-      - VITE_API_URL=http://localhost:3000
-    networks:
-      - app-network
+      - NODE_ENV=production
+    restart: unless-stopped
 
   # Phishing Attempts Management Server
-  phishing-management-server:
+  server:
     build:
       context: ./phishing-attempts-management-server
       dockerfile: Dockerfile
-    depends_on:
-      - shared-lib
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
+      - JWT_SECRET=cymulate
       - PORT=3000
+      - NODE_ENV=development
+      - DB_USER=avishaidotan
+      - DB_USER_PASSWORD=2P7dKjFyW2JruDMn
+      - DB_NAME=cymulate
       - FRONTEND_URL=http://localhost:5000
-    networks:
-      - app-network
-  
+    restart: unless-stopped
+
   # Phishing Simulation Server
-  phishing-simulation-server:
+  phishing-server:
     build:
       context: ./phishing-simulation-server
       dockerfile: Dockerfile
-    depends_on:
-      - shared-lib
     ports:
-      - "3001:3001"
+      - "7000:7000"
     environment:
-      - PORT=3001
-    networks:
-      - app-network
+      - PORT=7000
+      - NODE_ENV=development
+      - DB_USER=avishaidotan
+      - DB_USER_PASSWORD=2P7dKjFyW2JruDMn
+      - DB_NAME=cymulate
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=avishaidotan@gmail.com
+      - SMTP_PASS=ughw agba ghcj nmhs
+      - SMTP_FROM=avishaidotan@gmail.com
+    restart: unless-stopped
 
 networks:
   app-network:

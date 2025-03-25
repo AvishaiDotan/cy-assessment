@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import {  authService } from '../services/authService';
-import {  UserDTO } from '@avishaidotan/shared-lib';
+import { authService } from '../services/authService';
+import { IUser } from '@avishaidotan/shared-lib';
 interface AuthContextType {
-    user: UserDTO | null;
+    user: IUser | null;
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
     signup: (name: string, email: string, password: string) => Promise<void>;
@@ -13,7 +13,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<UserDTO | null>(null);
+    const [user, setUser] = useState<IUser | null>(null);
     const [loading, setLoading] = useState(true);
     const location = useLocation();
 

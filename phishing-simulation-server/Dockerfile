@@ -2,13 +2,6 @@ FROM node:18-alpine as build
 
 WORKDIR /app
 
-# First create the node_modules/shared-lib directory structure
-RUN mkdir -p /app/node_modules/shared-lib
-
-# Copy shared-lib files from the shared-lib image
-COPY --from=shared-lib:latest /app/dist /app/node_modules/shared-lib/dist
-COPY --from=shared-lib:latest /app/package.json /app/node_modules/shared-lib/package.json
-
 # Copy package.json and install dependencies
 COPY package*.json ./
 RUN npm install
@@ -28,17 +21,14 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --only=production
 
-# Create shared-lib structure in the production image
-RUN mkdir -p /app/node_modules/shared-lib
-
-# Copy shared-lib
-COPY --from=build /app/node_modules/shared-lib /app/node_modules/shared-lib
+# Copy .env file
+COPY .env ./
 
 # Copy built application
 COPY --from=build /app/dist ./dist
 
 # Expose the port
-EXPOSE 3001
+EXPOSE 7000
 
 # Start the server
 CMD ["npm", "run", "start:prod"] 

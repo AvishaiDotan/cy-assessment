@@ -98,7 +98,7 @@ export const Home: React.FC = () => {
                   <span className="font-medium text-white">Email:</span> {user?.email}
                 </p>
                 <p className="text-sm text-gray-300">
-                  <span className="font-medium text-white">ID:</span> {user?._id}
+                  <span className="font-medium text-white">ID:</span> {user?._id?.toString()}
                 </p>
               </div>
             </div>
@@ -163,7 +163,7 @@ export const Home: React.FC = () => {
                 </div>
               ) : error ? (
                 <div className="text-[#e3316c] text-sm">{error}</div>
-              ) : simulations.length > 0 ? (
+              ) : Array.isArray(simulations) && simulations.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-700">
                     <thead>
