@@ -4,7 +4,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService } from '../auth.service';
 import { JwtPayload } from 'jsonwebtoken';
 import { Request } from 'express';
-import { IUser } from 'shared-lib';
 
 const cookieExtractor = (req: Request): string | null => {
     let token = null;

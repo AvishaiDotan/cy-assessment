@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
-import { IPhishingPayload } from 'shared-lib';
+import { IPhishingPayload } from '@avishaidotan/shared-lib';
 import { SimulationsService } from './simulations.service';
 import { AuthGuard } from '@nestjs/passport';
 

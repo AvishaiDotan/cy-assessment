@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { IPhishingPayload } from 'shared-lib';
+import { IPhishingPayload } from '@avishaidotan/shared-lib';
 import { simulationsService } from '../services/simulationsService';
 import { pollingService } from '../services/pollingService';
 

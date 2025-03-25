@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {  authService } from '../services/authService';
-import {  UserDTO } from 'shared-lib';
+import {  UserDTO } from '@avishaidotan/shared-lib';
 interface AuthContextType {
     user: UserDTO | null;
     loading: boolean;

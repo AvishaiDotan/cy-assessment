@@ -1,5 +1,5 @@
 {
-  "name": "shared-lib",
+  "name": "@avishaidotan/shared-lib",
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Shared library for Cymulate project",
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@types/crypto-js": "^4.2.1",
     "@types/mongoose": "^5.11.96",

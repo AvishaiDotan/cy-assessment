@@ -1,5 +1,5 @@
 import { httpClient } from './httpClient';
-import { IPhishingPayload } from 'shared-lib';
+import { IPhishingPayload } from '@avishaidotan/shared-lib';
 
 
 class SimulationsService {

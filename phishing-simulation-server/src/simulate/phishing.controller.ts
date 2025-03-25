@@ -1,10 +1,8 @@
 import { Controller, Post, Body, HttpException, HttpStatus, Get, Param, UseGuards, Req } from '@nestjs/common';
-import { IPhishingPayload } from 'shared-lib';
+import { IPhishingPayload } from '@avishaidotan/shared-lib';
 import { EmailService } from '../services/email.service';
 import { DbService } from '../services/db.service';
 import { TokenGuard } from '../services/auth/token.guard';
-import { JwtPayload } from 'jsonwebtoken';
-import { Request } from 'express';
 
 
 @Controller('phishing')

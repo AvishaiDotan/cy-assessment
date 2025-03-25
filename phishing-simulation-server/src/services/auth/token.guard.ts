@@ -1,10 +1,6 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import * as jwt from 'jsonwebtoken';
-import { JwtPayload } from 'jsonwebtoken';
+import { Injectable, CanActivate, ExecutionContext, BadRequestException } from '@nestjs/common';
 import { DbService } from '../db.service';
-import { IPhishingPayload } from 'shared-lib';
-import { Types } from 'mongoose';
+import { IPhishingPayload } from '@avishaidotan/shared-lib';
 
 @Injectable()
 export class TokenGuard implements CanActivate {

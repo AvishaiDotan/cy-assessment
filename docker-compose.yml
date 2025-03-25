@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Shared library build container - this is just for building, not a running service
+  shared-lib:
+    build:
+      context: ./shared-lib
+      dockerfile: Dockerfile
+    image: shared-lib:latest
+    # This container doesn't need to keep running
+    command: "echo 'Shared library built successfully'"
+    
+  # Frontend application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    depends_on:
+      - shared-lib
+    ports:
+      - "5000:5000"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    networks:
+      - app-network
+
+  # Phishing Attempts Management Server
+  phishing-management-server:
+    build:
+      context: ./phishing-attempts-management-server
+      dockerfile: Dockerfile
+    depends_on:
+      - shared-lib
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - FRONTEND_URL=http://localhost:5000
+    networks:
+      - app-network
+  
+  # Phishing Simulation Server
+  phishing-simulation-server:
+    build:
+      context: ./phishing-simulation-server
+      dockerfile: Dockerfile
+    depends_on:
+      - shared-lib
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

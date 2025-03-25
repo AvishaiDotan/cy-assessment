@@ -1,6 +1,6 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { IUser } from 'shared-lib';
+import { IUser } from '@avishaidotan/shared-lib';
 import { JwtService } from '@nestjs/jwt';
 import { DbService } from '../../services/db/db.service';
 

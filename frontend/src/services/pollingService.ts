@@ -1,5 +1,5 @@
 import { simulationsService } from './simulationsService';
-import { IPhishingPayload } from 'shared-lib';
+import { IPhishingPayload } from '@avishaidotan/shared-lib';
 
 class PollingService {
   private interval: NodeJS.Timeout | null = null;

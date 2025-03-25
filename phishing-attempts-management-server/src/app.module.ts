@@ -1,15 +1,18 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './controllers/auth/auth.module';
-import { DbService } from './services/db/db.service';
-import { SimulationsController } from './controllers/simulations/simulations.controller';
-import { SimulationsService } from './controllers/simulations/simulations.service';
 import { SimulationsModule } from './controllers/simulations/simulations.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
-  imports: [AuthModule, SimulationsModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    AuthModule, 
+    SimulationsModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
