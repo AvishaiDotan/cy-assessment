@@ -4,7 +4,8 @@ Content-Type: application/json
 
 {
   "email": "test@example.com",
-  "password": "password123"
+  "password": "password123",
+  "name": "Test User"
 }
 
 ### Login with the created user
@@ -22,7 +23,8 @@ Content-Type: application/json
 
 {
   "email": "test@example.com",
-  "password": "password123"
+  "password": "password123",
+  "name": "Test User"
 }
 
 ### Try to login with wrong password (should fail)
