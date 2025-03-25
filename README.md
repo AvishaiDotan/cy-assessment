@@ -27,7 +27,7 @@ A React-based web application that provides an intuitive user interface for mana
 ### 2. Phishing Attempts Management Server
 
 This service manages the core business logic for phishing simulations, including:
-- User authentication and authorization
+- User authentication
 - Storing and retrieving phishing campaign data
 - Managing simulation results and analytics
 - Communication with the Phishing Simulation Server
@@ -71,9 +71,6 @@ A common library that provides shared functionality across services:
 
 2. **Install dependencies**:
    ```bash
-   # Install shared library dependencies
-   cd shared-lib
-   npm install
    
    # Install backend dependencies
    cd ../phishing-attempts-management-server
