@@ -1,0 +1,53 @@
+### Environment Variables
+@baseUrl = http://localhost:3000
+@authToken = {{login.response.headers.set-cookie}}
+
+### AUTH ENDPOINTS ###
+
+### Sign Up
+# @name signup
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "name": "Test User"
+}
+
+### Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+### Get Current User Profile
+GET {{baseUrl}}/auth/me
+Cookie: {{authToken}}
+
+### Logout
+POST {{baseUrl}}/auth/logout
+Cookie: {{authToken}}
+
+### SIMULATIONS ENDPOINTS ###
+
+### Get All Simulations
+GET {{baseUrl}}/simulations
+Cookie: {{authToken}}
+
+### Create New Simulation
+POST {{baseUrl}}/simulations
+Cookie: {{authToken}}
+Content-Type: application/json
+
+{
+  "recipient": "target@example.com",
+  "emailContent": "This is a test phishing email content",
+  "subject": "Important Security Update",
+  "senderName": "IT Department",
+  "senderEmail": "it@company.com"
+} 

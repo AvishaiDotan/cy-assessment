@@ -1,11 +1,15 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, InternalServerErrorException, Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { IUser } from '@avishaidotan/shared-lib';
 import { JwtService } from '@nestjs/jwt';
 import { DbService } from '../../services/db/db.service';
+import { UserWithoutPassword } from './types';
+
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private jwtService: JwtService,
     private readonly dbService: DbService,
@@ -25,12 +29,13 @@ export class AuthService {
     email: string;
     password: string;
     name: string;
-  }): Promise<Omit<IUser, 'password'>> {
+  }): Promise<UserWithoutPassword> {
     try {
       const existingUser = await this.dbService.usersRepository.findOne({
         email: signupPayload.email,
       });
       if (existingUser) {
+        this.logger.warn(`Signup attempt failed: Email ${signupPayload.email} already exists`);
         throw new ConflictException('Email already exists');
       }
 
@@ -42,14 +47,14 @@ export class AuthService {
       };
 
       const createdUser = await this.dbService.usersRepository.insertOne(newUser);
-      const { password, ...result } = (createdUser as any)._doc;
-      return result;
+      const { password, ...userWithoutPassword } = (createdUser as any)._doc;
+      return userWithoutPassword;
     } catch (error) {
       if (error instanceof ConflictException) {
-        throw new ConflictException('Email already exists');
-      } else {
         throw error;
       }
+      this.logger.error(`Failed to create user account: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Failed to create user account');
     }
   }
 

@@ -12,7 +12,5 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'public'),
     }),
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}

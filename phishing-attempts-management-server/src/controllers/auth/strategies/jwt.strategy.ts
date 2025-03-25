@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService } from '../auth.service';
@@ -15,6 +15,7 @@ const cookieExtractor = (req: Request): string | null => {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+    private readonly logger = new Logger(JwtStrategy.name);
     constructor(private authService: AuthService) {
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
@@ -32,7 +33,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             const { password, ...result } = (user as any)._doc;
             return result;
         } catch (error) {
-            throw new UnauthorizedException('Invalid token');
+            this.logger.error(`Failed to validate token: ${error.message}`, error.stack);
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Failed to validate token');
         }
     }
+
+
 } 
