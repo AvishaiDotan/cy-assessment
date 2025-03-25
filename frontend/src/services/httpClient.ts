@@ -24,12 +24,6 @@ class HttpClient {
         'Content-Type': 'application/json',
       },
     });
-    
-    // Add request interceptor to log URLs
-    this.client.interceptors.request.use(config => {
-      console.log('Making request to:', (config.baseURL || '') + (config.url || ''));
-      return config;
-    });
   }
 
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {

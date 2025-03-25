@@ -109,6 +109,21 @@ export class EmailService {
 
     public async sendEmail(payload: IPhishingPayload) {
         try {
+            // Validate payload
+            if (!payload.recipient || !payload.emailContent) {
+                throw new HttpException(
+                    'Email recipient and content are required',
+                    HttpStatus.BAD_REQUEST
+                );
+            }
+            
+            if (!this.isValidEmail(payload.recipient)) {
+                throw new HttpException(
+                    'Invalid email address format',
+                    HttpStatus.BAD_REQUEST
+                );
+            }
+            
             const preparedPayload = await this.prepareAndUpdatePayload(payload);
             
             const mailOptions = {
@@ -126,5 +141,10 @@ export class EmailService {
                 HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
+    }
+    
+    private isValidEmail(email: string): boolean {
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        return emailRegex.test(email);
     }
 }
