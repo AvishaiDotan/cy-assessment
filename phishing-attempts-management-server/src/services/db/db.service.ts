@@ -13,18 +13,24 @@ export class DbService implements OnModuleInit{
     public usersRepository: DbRepository<IUserDocument>;
     public phishingPayloadRepository: DbRepository<IPhishingPayloadDocument>;
     onModuleInit() {
-        console.log('Initializing DB Service...');
         this.initDb();
     }
 
     private async initDb() {
-        console.log('Connecting to MongoDB with URI:', process.env.MONGODB_URI);
-        this.dbService = await SharedDbService.init('', '', '', process.env.MONGODB_URI || null);
-        console.log('MongoDB connection established');
+        const isDevelopment = process.env.NODE_ENV === 'development';
         
-        console.log('Creating repositories...');
+        if (isDevelopment) {
+            this.dbService = await SharedDbService.init(
+                'avishaidotan',
+                '2P7dKjFyW2JruDMn',
+                'test2',
+                null
+            );
+        } else {
+            this.dbService = await SharedDbService.init('', '', '', process.env.MONGODB_URI || null);
+        }
+        
         this.usersRepository = this.dbService.createRepository<IUserDocument>('users', userDbSchema);
         this.phishingPayloadRepository = this.dbService.createRepository<IPhishingPayloadDocument>('phishingPayloads', phishingPayloadDbSchema);
-        console.log('Repositories created successfully');
     }
 }
