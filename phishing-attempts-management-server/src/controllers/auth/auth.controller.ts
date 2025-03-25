@@ -38,4 +38,14 @@ export class AuthController {
   getProfile(@Request() req) {
     return req.user;
   }
+
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
+    return { message: 'Logged out successfully' };
+  }
 }

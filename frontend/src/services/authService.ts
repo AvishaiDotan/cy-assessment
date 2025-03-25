@@ -20,6 +20,7 @@ class AuthService {
 
   async logout(): Promise<void> {
     await httpClient.post("/auth/logout");
+    window.location.href = "/";
   }
 }
 
