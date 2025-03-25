@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Request, Body, Res } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Body, Res, Get } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
@@ -30,6 +30,12 @@ export class AuthController {
       sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
+    return req.user;
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('me')
+  getProfile(@Request() req) {
     return req.user;
   }
 }

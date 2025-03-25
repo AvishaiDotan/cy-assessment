@@ -1,11 +1,14 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+// import * as dotenv from 'dotenv';
+
+// dotenv.config();
 
 class HttpClient {
   private client: AxiosInstance;
 
   constructor() {
     this.client = axios.create({
-      baseURL: 'http://localhost:5000',
+      baseURL: 'http://localhost:3000',
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',

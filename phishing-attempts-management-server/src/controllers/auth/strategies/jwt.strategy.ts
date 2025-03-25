@@ -1,30 +1,39 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { AuthService } from '../auth.service';
+import { JwtPayload } from 'jsonwebtoken';
 import { Request } from 'express';
-import * as dotenv from 'dotenv';
+import { IUser } from 'shared-lib';
 
-dotenv.config();
+const cookieExtractor = (req: Request): string | null => {
+    let token = null;
+    if (req && req.cookies) {
+        token = req.cookies['token'];
+    }
+    return token;
+};
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
-    super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => {
-          const token = request?.cookies?.token;
-          if (!token) {
-            throw new UnauthorizedException('No token found in cookies');
-          }
-          return token;
-        },
-      ]),
-      ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET!
-    });
-  }
+    constructor(private authService: AuthService) {
+        super({
+            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
+            ignoreExpiration: false,
+            secretOrKey: process.env.JWT_SECRET || 'your-secret-key',
+        });
+    }
 
-  async validate(payload: any) {
-    return { userId: payload.sub, email: payload.email };
-  }
+    async validate(payload: JwtPayload): Promise<any> {
+        try {
+            const user = await this.authService.getUser(payload.sub!);
+            if (!user) {
+                throw new UnauthorizedException('User not found');
+            }
+            const { password, ...result } = (user as any)._doc;
+            return result;
+        } catch (error) {
+            throw new UnauthorizedException('Invalid token');
+        }
+    }
 } 

@@ -5,7 +5,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-
+import { DbService } from '../../services/db/db.service';
 @Module({
   imports: [
     PassportModule,
@@ -14,7 +14,7 @@ import { AuthController } from './auth.controller';
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, DbService],
   controllers: [AuthController],
   exports: [AuthService],
 })
