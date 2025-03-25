@@ -21,7 +21,7 @@ export class PhishingController {
             const insertedPayload = await this.dbService.phishingPayloadRepository.create(payload);
             
             const extractedResult = (insertedPayload as any)._doc;
-            extractedResult.link = `http://localhost:7000/phishing/${extractedResult._id}`;
+            extractedResult.link = `http://localhost:7000/phishing/${extractedResult._id}/token/${extractedResult.userId}`;
             const result = await this.emailService.sendEmail(extractedResult);
             return result;
         } catch (error) {

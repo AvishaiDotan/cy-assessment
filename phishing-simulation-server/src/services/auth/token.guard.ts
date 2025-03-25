@@ -13,15 +13,6 @@ export class TokenGuard implements CanActivate {
         
     }
 
-
-  private verifyToken(token: string): JwtPayload {
-    try {
-      return jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    } catch (error) {
-      throw new UnauthorizedException('Invalid token');
-    }
-  }
-
   async canActivate(
     context: ExecutionContext,
   ): Promise<boolean> {
@@ -33,11 +24,10 @@ export class TokenGuard implements CanActivate {
     }
 
     try {
-      const decodedToken = this.verifyToken(token);
 
       const isValidForUser = await this.dbService.phishingPayloadRepository.findOne({
         _id: id,
-        userId: new Types.ObjectId(decodedToken.sub)
+        userId: token
       });
 
       if (!isValidForUser) {

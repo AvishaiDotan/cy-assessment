@@ -5,9 +5,6 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Controller('simulations')
 export class SimulationsController {
-    /**
-     *
-     */
     constructor(private readonly simulationsService: SimulationsService) {
         
     }
