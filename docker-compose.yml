@@ -40,9 +40,12 @@ services:
     environment:
       - JWT_SECRET=cymulate
       - PORT=3000
-      - NODE_ENV=development
+      - NODE_ENV=production
       - MONGODB_URI=mongodb://avishaidotan:2P7dKjFyW2JruDMn@mongodb:27017/cymulate?authSource=admin
       - FRONTEND_URL=http://localhost:5000
+      - PHISHING_SERVER_URL=http://phishing-server:7000
+      - PHISHING_SERVER_URL_DEV=http://phishing-server:7000
+      - DB_NAME=cymulate
     networks:
       - app-network
     restart: unless-stopped
@@ -56,13 +59,15 @@ services:
       - "7000:7000"
     environment:
       - PORT=7000
-      - NODE_ENV=development
+      - NODE_ENV=production
       - MONGODB_URI=mongodb://avishaidotan:2P7dKjFyW2JruDMn@mongodb:27017/cymulate?authSource=admin
       - SMTP_HOST=smtp.gmail.com
       - SMTP_PORT=587
       - SMTP_USER=avishaidotan@gmail.com
       - SMTP_PASS=ughw agba ghcj nmhs
       - SMTP_FROM=avishaidotan@gmail.com
+      - PHISHING_SERVER_URL=http://localhost:7000/phishing/
+      - PHISHING_SERVER_URL_DEV=http://localhost:7000/phishing/
     networks:
       - app-network
     restart: unless-stopped

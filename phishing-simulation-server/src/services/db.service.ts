@@ -6,17 +6,31 @@ dotenv.config();
 
 @Injectable()
 export class DbService implements OnModuleInit{
-    /**
-     *
-     */
     private dbService: SharedDbService;
     public phishingPayloadRepository: DbRepository<IPhishingPayloadDocument>;
+    
     onModuleInit() {
         this.initDb();
     }
 
     private async initDb() {
-        this.dbService = await SharedDbService.init('', '', '', process.env.MONGODB_URI || null);
-        this.phishingPayloadRepository = this.dbService.createRepository<IPhishingPayloadDocument>('phishingPayloads', phishingPayloadDbSchema);
+        const isDevelopment = process.env.NODE_ENV === 'development';
+        
+        try {
+            if (isDevelopment) {
+                this.dbService = await SharedDbService.init(
+                    process.env.DB_USERNAME!,
+                    process.env.DB_PASSWORD!,
+                    process.env.DB_NAME!,
+                    null
+                );
+            } else {
+                this.dbService = await SharedDbService.init('', '', '', process.env.MONGODB_URI || null);
+            }
+            
+            this.phishingPayloadRepository = this.dbService.createRepository<IPhishingPayloadDocument>('phishingPayloads', phishingPayloadDbSchema);
+        } catch (error) {
+            throw error;
+        }
     }
 }

@@ -10,16 +10,17 @@ dotenv.config();
 @Injectable()
 export class SimulationsService {
     private readonly logger = new Logger(SimulationsService.name);
-    private phishingServerUrl: string;
 
-    constructor(private readonly dbService: DbService) {
-        // Get the phishing server URL from environment variables with a fallback
-        this.phishingServerUrl = process.env.PHISHING_SERVER_URL || 'http://phishing-server:7000';
+    constructor(private readonly dbService: DbService) {}
+
+    private getPhishingServerUrl(): string {
+        return process.env.NODE_ENV === 'development' 
+            ? process.env.PHISHING_SERVER_URL_DEV! 
+            : process.env.PHISHING_SERVER_URL!;
     }
 
     public async getAll(id: any): Promise<IPhishingPayload[]> {
         try {
-            
             if (!id) {
                 this.logger.error('User ID is undefined or null');
                 throw new Error('User ID is required');
@@ -45,7 +46,9 @@ export class SimulationsService {
 
     public async insert(payload: IPhishingPayload) {
         try {
-            const response = await axios.post(`${this.phishingServerUrl}/phishing/send`, payload);
+            const phishingServerUrl = this.getPhishingServerUrl();
+            this.logger.debug(`Using phishing server URL: ${phishingServerUrl}`);
+            const response = await axios.post(`${phishingServerUrl}/phishing/send`, payload);
             return response.data;
         } catch (error) {
             this.logger.error(`Failed to process simulation: ${error.message}`);

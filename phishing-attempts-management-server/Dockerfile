@@ -6,11 +6,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the application including .env file
+# Copy the rest of the application
 COPY . .
-
-# Load environment variables from .env file
-ENV $(cat .env | xargs)
 
 # Create the public directory for static files
 RUN mkdir -p public
@@ -26,11 +23,6 @@ WORKDIR /app
 # Copy package files and install production dependencies
 COPY package*.json ./
 RUN npm install --only=production
-
-# Copy .env file for production environment
-COPY .env ./
-# Set environment variables from .env file
-ENV $(cat .env | xargs)
 
 # Copy built application
 COPY --from=build /app/dist ./dist

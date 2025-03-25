@@ -27,18 +27,11 @@ export class SimulationsController {
     @Post()
     @UseGuards(AuthGuard('jwt'))
     async insertSimulation(@Request() req, @Body() payload: IPhishingPayload) {
-        this.logger.log('POST /simulations - Request received');
-        this.logger.debug('User from request:', req.user);
-        this.logger.debug('Simulation data:', payload);
-        
         try {
             payload.userId = req.user._id.toString();
             const result = await this.simulationsService.insert(payload);
-            this.logger.log('POST /simulations - Successfully created simulation');
-            this.logger.debug('Created simulation:', result);
-            return result;
+            return true;
         } catch (error) {
-            this.logger.error('POST /simulations - Error creating simulation:', error);
             throw error;
         }
     }
