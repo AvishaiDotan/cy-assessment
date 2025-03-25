@@ -97,6 +97,8 @@ A phishing simulation platform built with React, NestJS, and MongoDB. Test your 
 4. **Shared Library**: Common code and types
 
 ### Communication Flow
+![image](https://github.com/user-attachments/assets/92ba5ac5-bd4d-45f9-ac5b-43f240e805f3)
+
 1. Frontend → Management Server (all operations)
 2. Management Server → Simulation Server (new campaigns)
 3. Simulation Server → Database (status updates)
