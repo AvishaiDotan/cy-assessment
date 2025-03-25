@@ -8,11 +8,9 @@ RUN npm install
 
 COPY . .
 
-ARG NODE_ENV=development
+ARG NODE_ENV=production
+ENV VITE_API_URL=http://server:3000
 
-RUN if [ "$NODE_ENV" = "production" ]; then \
-    cp .env.docker .env.production; \
-    fi
 
 # Build the frontend
 RUN npm run build
