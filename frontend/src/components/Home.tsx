@@ -2,24 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { IPhishingPayload } from 'shared-lib';
 import { simulationsService } from '../services/simulationsService';
+import { pollingService } from '../services/pollingService';
 
-enum ThemeMode {
-    LIGHT = "LIGHT",
-    DARK = "DARK",
-    SYSTEM = "SYSTEM"
-}
-
-enum Language {
-    EN = "EN",
-    ES = "ES",
-    HE = "HE"
-}
 
 export const Home: React.FC = () => {
   const { user, logout } = useAuth();
   const [simulations, setSimulations] = useState<IPhishingPayload[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isPolling, setIsPolling] = useState(false);
   const [formData, setFormData] = useState<Partial<IPhishingPayload>>({
     recipient: '',
     emailContent: '',
@@ -29,20 +20,21 @@ export const Home: React.FC = () => {
   const [createSuccess, setCreateSuccess] = useState(false);
 
   useEffect(() => {
-    fetchSimulations();
-  }, []);
-
-  const fetchSimulations = async () => {
-    try {
-      const data = await simulationsService.getAllSimulations();
-      setSimulations(data);
+    // Subscribe to polling service
+    const unsubscribe = pollingService.subscribe((data, polling) => {
+      if (data.length > 0) {
+        setSimulations(data);
+      }
+      setIsPolling(polling);
       setError(null);
-    } catch (err) {
-      setError('Failed to fetch simulations');
-    } finally {
       setLoading(false);
-    }
-  };
+    });
+
+    // Cleanup subscription on unmount
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const handleCreateSimulation = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,7 +151,12 @@ export const Home: React.FC = () => {
           {/* Simulations Table */}
           <div className="bg-[#ffffff]/10 backdrop-blur-sm overflow-hidden shadow-lg rounded-lg border border-gray-700">
             <div className="p-5">
-              <h2 className="text-lg font-medium text-white mb-4">Phishing Simulations</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-medium text-white">Phishing Simulations</h2>
+                {isPolling && (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#6834f4]"></div>
+                )}
+              </div>
               {loading ? (
                 <div className="flex justify-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6834f4]"></div>
@@ -172,6 +169,7 @@ export const Home: React.FC = () => {
                     <thead>
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Recipient</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email Content</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Link</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Created At</th>
@@ -181,7 +179,10 @@ export const Home: React.FC = () => {
                       {simulations.map((simulation) => (
                         <tr key={simulation._id?.toString()} className="hover:bg-[#ffffff]/5">
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{simulation.recipient}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{simulation.status}</td>
+                          <td className="px-6 py-4 text-sm text-gray-300 max-w-xs truncate">{simulation.emailContent?.substring(0, 50)}...</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {simulation.status === 'pending' ? 'Pending' : simulation.status}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{simulation.link}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                             {new Date(simulation.createdAt!).toLocaleString()}

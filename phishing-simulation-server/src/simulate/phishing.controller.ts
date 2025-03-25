@@ -6,9 +6,6 @@ import { TokenGuard } from '../services/auth/token.guard';
 import { JwtPayload } from 'jsonwebtoken';
 import { Request } from 'express';
 
-interface RequestWithPhishingPayload extends Request {
-    phishingPayload: IPhishingPayload;
-}
 
 @Controller('phishing')
 export class PhishingController {
@@ -17,12 +14,7 @@ export class PhishingController {
     @Post('send')
     async sendPhishingEmail(@Body() payload: IPhishingPayload) {
         try {
-            payload.link = "temp"
-            const insertedPayload = await this.dbService.phishingPayloadRepository.create(payload);
-            
-            const extractedResult = (insertedPayload as any)._doc;
-            extractedResult.link = `http://localhost:7000/phishing/${extractedResult._id}/token/${extractedResult.userId}`;
-            const result = await this.emailService.sendEmail(extractedResult);
+            const result = await this.emailService.sendEmail(payload);
             return result;
         } catch (error) {
             throw new HttpException(
@@ -37,7 +29,6 @@ export class PhishingController {
     async validatePhishingEmail(@Req() request: any) {
         const phishingPayload = request.phishingPayload;
         
-        // Update payload status
         phishingPayload.status = "valid";
 
         await this.dbService.phishingPayloadRepository.updateOne(
