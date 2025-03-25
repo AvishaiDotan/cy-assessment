@@ -144,36 +144,3 @@ cd phishing-simulation-server && npm run start:dev
 # Terminal 3 - Frontend
 cd frontend && npm run dev
 ```
-
-## Development Features
-
-- Hot-reloading for all services
-- TypeScript compilation
-- ESLint and Prettier configuration
-- Jest testing setup
-- Docker containerization
-- Shared library for code reuse
-
-## Testing
-
-Each service includes a comprehensive test suite:
-
-```bash
-# Run tests for any service
-npm test
-npm run test:watch    # Watch mode
-npm run test:cov     # Coverage report
-npm run test:e2e     # End-to-end tests
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
-
-## License
-
-This project is proprietary and confidential. All rights reserved.
