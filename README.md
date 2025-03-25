@@ -1,4 +1,9 @@
 # Cymulate Phishing Simulation Platform
+![image](https://github.com/user-attachments/assets/2a49a9ac-7f91-48fd-b647-489bfe8dde5b)
+![image](https://github.com/user-attachments/assets/f66865cd-c497-4e32-8a46-d8d51fe5dafe)
+
+![image](https://github.com/user-attachments/assets/caa9647b-b511-403c-aa3e-7ba365bf3d25)
+![image](https://github.com/user-attachments/assets/b89bcb60-7c21-4de1-a945-fe19ae3d3d40)
 
 ## Project Overview
 
