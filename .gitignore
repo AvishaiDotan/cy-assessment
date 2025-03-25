@@ -46,3 +46,12 @@ build/
 *.njsproj
 *.sln
 *.sw? 
+
+# Environment variables
+.env
+**/.env
+**/.env.*
+!**/.env.*.example
+
+.gitignore
+docker-compose.yml
