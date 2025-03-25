@@ -39,11 +39,8 @@ export class TokenGuard implements CanActivate {
             request.phishingPayload = extractedResult;
             return true;
         } catch (error) {
-            if (error instanceof BadRequestException || error instanceof UnauthorizedException) {
-                throw error;
-            }
             this.logger.error(`Token validation error: ${error.message}`);
-            return false;
+            throw error;
         }
     }
 } 

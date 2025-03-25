@@ -2,7 +2,7 @@ import { Injectable, ConflictException, NotFoundException, InternalServerErrorEx
 import * as bcrypt from 'bcrypt';
 import { IUser } from '@avishaidotan/shared-lib';
 import { JwtService } from '@nestjs/jwt';
-import { DbService } from '../../services/db/db.service';
+import { DbService } from '../../services/db.service';
 import { UserWithoutPassword } from './types';
 
 

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { IPhishingPayload } from '@avishaidotan/shared-lib';
 import { DbService } from '../services/db.service';
 import * as nodemailer from 'nodemailer';
@@ -8,6 +8,7 @@ dotenv.config();
 
 @Injectable()
 export class EmailService {
+    private readonly logger = new Logger(EmailService.name);
     private transporter: nodemailer.Transporter;
 
     constructor(private readonly dbService: DbService) {
@@ -92,19 +93,26 @@ export class EmailService {
     }
 
     private async prepareAndUpdatePayload(payload: IPhishingPayload) {
-        payload.link = "temp";
-        const insertedPayload = await this.dbService.phishingPayloadRepository.create(payload);
-        
-        const extractedResult = (insertedPayload as any)._doc;
-        
-        const baseUrl = process.env.NODE_ENV! === 'development' ? process.env.PHISHING_SERVER_URL_DEV! : process.env.PHISHING_SERVER_URL!;
-        extractedResult.link = `${baseUrl}${extractedResult._id}/token/${extractedResult.userId}`;
-        
-        await this.dbService.phishingPayloadRepository.updateOne(
-            { _id: insertedPayload._id },
-            { $set: { link: extractedResult.link } }
-        );
-        return extractedResult;
+        try {
+            payload.link = "temp";
+            const insertedPayload = await this.dbService.phishingPayloadRepository.create(payload);
+            
+            const extractedResult = (insertedPayload as any)._doc;
+            
+            const baseUrl = process.env.NODE_ENV! === 'development' ? process.env.PHISHING_SERVER_URL_DEV! : process.env.PHISHING_SERVER_URL!;
+            extractedResult.link = `${baseUrl}${extractedResult._id}/token/${extractedResult.userId}`;
+            
+            await this.dbService.phishingPayloadRepository.updateOne(
+                { _id: insertedPayload._id },
+                { $set: { link: extractedResult.link } }
+            );
+            return extractedResult;
+        } catch (error) {
+            this.logger.error(`Failed to prepare and update payload: ${error.message}`, error.stack);
+            throw new InternalServerErrorException(
+                'Failed to process phishing payload. Please try again later.',
+            );
+        }
     }
 
     public async sendEmail(payload: IPhishingPayload) {
@@ -136,10 +144,7 @@ export class EmailService {
             const info = await this.transporter.sendMail(mailOptions);
             return preparedPayload;
         } catch (error) {
-            throw new HttpException(
-                error.message || 'Failed to send phishing email',
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            throw error;
         }
     }
     
