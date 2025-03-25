@@ -20,6 +20,32 @@
 docker-compose up
 ```
 
+### Required Environment Variables for Docker
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# MongoDB Configuration
+MONGODB_URI=mongodb://mongodb:27017/cymulate
+
+# JWT Configuration
+JWT_SECRET=your_jwt_secret_here
+JWT_EXPIRATION=24h
+
+# SMTP Configuration (for sending emails)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_specific_password
+SMTP_FROM=your_email@gmail.com
+
+# Server Ports
+FRONTEND_PORT=5000
+MANAGEMENT_SERVER_PORT=3001
+SIMULATION_SERVER_PORT=7000
+```
+
+> **Note**: For Gmail, you'll need to use an App Password instead of your regular password. Generate one in your Google Account settings under Security > 2-Step Verification > App passwords.
+
 ### Option 2: Manual Setup
 ```bash
 # 1. Install Dependencies
