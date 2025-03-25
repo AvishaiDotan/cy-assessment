@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { IPhishingPayload } from 'shared-lib';
+import { simulationsService } from '../services/simulationsService';
 
 enum ThemeMode {
     LIGHT = "LIGHT",
@@ -15,41 +17,48 @@ enum Language {
 
 export const Home: React.FC = () => {
   const { user, logout } = useAuth();
-  const [settings, setSettings] = useState<any[]>([]);
+  const [simulations, setSimulations] = useState<IPhishingPayload[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<any>({
-    theme: ThemeMode.SYSTEM,
-    language: Language.EN,
+  const [formData, setFormData] = useState<Partial<IPhishingPayload>>({
+    recipient: '',
+    emailContent: '',
+    status: 'pending',
+    link: '',
   });
   const [createSuccess, setCreateSuccess] = useState(false);
 
   useEffect(() => {
-    fetchSettings();
+    fetchSimulations();
   }, []);
 
-  const fetchSettings = async () => {
+  const fetchSimulations = async () => {
     try {
-      const data = await ({} as any).getAllSettings();
-      setSettings(data);
+      const data = await simulationsService.getAllSimulations();
+      setSimulations(data);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch settings');
+      setError('Failed to fetch simulations');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateSetting = async (e: React.FormEvent) => {
+  const handleCreateSimulation = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const newSetting = await ({} as any).createSetting(formData);
-      setSettings([...settings, newSetting]);
-      setFormData({ theme: ThemeMode.SYSTEM, language: Language.EN });
+      const newSimulation = await simulationsService.createSimulation(formData);
+      setSimulations([...simulations, newSimulation]);
+      setFormData({
+        recipient: '',
+        emailContent: '',
+        status: 'pending',
+        link: '',
+      });
       setCreateSuccess(true);
       setTimeout(() => setCreateSuccess(false), 3000);
     } catch (err) {
-      setError('Failed to create setting');
+      setError('Failed to create simulation');
     }
   };
 
@@ -88,7 +97,7 @@ export const Home: React.FC = () => {
           {/* User Details Card */}
           <div className="bg-[#ffffff]/10 backdrop-blur-sm overflow-hidden shadow-lg rounded-lg mb-6 border border-gray-700">
             <div className="p-5">
-              <h2 className="text-lg font-medium text-white mb-4">Account Information</h2>
+              <h2 className="text-lg font-medium text-white mb-4">User Information</h2>
               <div className="space-y-2">
                 <p className="text-sm text-gray-300">
                   <span className="font-medium text-white">Name:</span> {user?.name}
@@ -96,84 +105,95 @@ export const Home: React.FC = () => {
                 <p className="text-sm text-gray-300">
                   <span className="font-medium text-white">Email:</span> {user?.email}
                 </p>
+                <p className="text-sm text-gray-300">
+                  <span className="font-medium text-white">ID:</span> {user?._id}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Settings Section */}
-          <div className="bg-[#ffffff]/10 backdrop-blur-sm overflow-hidden shadow-lg rounded-lg border border-gray-700">
+          {/* Create Simulation Form */}
+          <div className="bg-[#ffffff]/10 backdrop-blur-sm overflow-hidden shadow-lg rounded-lg mb-6 border border-gray-700">
             <div className="p-5">
-              <h2 className="text-lg font-medium text-white mb-4">Phishing Campaign Settings</h2>
-              {loading ? (
-                <div className="flex justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6834f4]"></div>
-                </div>
-              ) : error ? (
-                <div className="text-[#e3316c] text-sm">{error}</div>
-              ) : settings.length > 0 ? (
-                <div className="space-y-4">
-                  {settings.map((setting) => (
-                    <div key={setting.id} className="border-b border-gray-700 pb-4 last:border-b-0">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="text-sm font-medium text-white">Campaign Theme: {setting.theme}</p>
-                          <p className="text-sm text-gray-300">Notification Language: {setting.language}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-400">No campaign settings found</p>
-              )}
-            </div>
-          </div>
-
-          {/* Create Settings Section */}
-          <div className="bg-[#ffffff]/10 backdrop-blur-sm overflow-hidden shadow-lg rounded-lg mt-6 border border-gray-700">
-            <div className="p-5">
-              <h2 className="text-lg font-medium text-white mb-4">Create New Campaign Setting</h2>
+              <h2 className="text-lg font-medium text-white mb-4">Create New Phishing Simulation</h2>
               
               {createSuccess && (
                 <div className="mb-4 bg-[#6834f4]/20 border border-[#6834f4] text-[#6834f4] px-4 py-3 rounded">
-                  Campaign setting created successfully!
+                  Simulation created successfully!
                 </div>
               )}
               
-              <form onSubmit={handleCreateSetting} className="space-y-4">
+              <form onSubmit={handleCreateSimulation} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Campaign Theme</label>
-                  <select
-                    value={formData.theme}
-                    onChange={(e) => setFormData({ ...formData, theme: e.target.value as ThemeMode })}
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Recipient Email</label>
+                  <input
+                    type="email"
+                    value={formData.recipient}
+                    onChange={(e) => setFormData({ ...formData, recipient: e.target.value })}
                     className="w-full px-3 py-2 bg-[#ffffff]/10 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#6834f4] focus:border-transparent"
-                  >
-                    {Object.values(ThemeMode).map((theme) => (
-                      <option key={theme} value={theme}>{theme}</option>
-                    ))}
-                  </select>
+                    required
+                  />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Notification Language</label>
-                  <select
-                    value={formData.language}
-                    onChange={(e) => setFormData({ ...formData, language: e.target.value as Language })}
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Email Content</label>
+                  <textarea
+                    value={formData.emailContent}
+                    onChange={(e) => setFormData({ ...formData, emailContent: e.target.value })}
                     className="w-full px-3 py-2 bg-[#ffffff]/10 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#6834f4] focus:border-transparent"
-                  >
-                    {Object.values(Language).map((lang) => (
-                      <option key={lang} value={lang}>{lang}</option>
-                    ))}
-                  </select>
+                    rows={4}
+                    required
+                  />
                 </div>
                 
                 <button
                   type="submit"
                   className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#6834f4] hover:bg-[#6834f4]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6834f4] transition duration-150 ease-in-out"
                 >
-                  Create Campaign Setting
+                  Create Simulation
                 </button>
               </form>
+            </div>
+          </div>
+
+          {/* Simulations Table */}
+          <div className="bg-[#ffffff]/10 backdrop-blur-sm overflow-hidden shadow-lg rounded-lg border border-gray-700">
+            <div className="p-5">
+              <h2 className="text-lg font-medium text-white mb-4">Phishing Simulations</h2>
+              {loading ? (
+                <div className="flex justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6834f4]"></div>
+                </div>
+              ) : error ? (
+                <div className="text-[#e3316c] text-sm">{error}</div>
+              ) : simulations.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-700">
+                    <thead>
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Recipient</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Link</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Created At</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-700">
+                      {simulations.map((simulation) => (
+                        <tr key={simulation._id?.toString()} className="hover:bg-[#ffffff]/5">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{simulation.recipient}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{simulation.status}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{simulation.link}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {new Date(simulation.createdAt!).toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400">No simulations found</p>
+              )}
             </div>
           </div>
         </div>
