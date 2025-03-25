@@ -16,7 +16,7 @@ export class DbService implements OnModuleInit{
     }
 
     private async initDb() {
-        this.dbService = await SharedDbService.init(process.env.DB_USER!, process.env.DB_USER_PASSWORD!, process.env.DB_NAME!, null);
+        this.dbService = await SharedDbService.init('', '', '', process.env.MONGODB_URI || null);
         this.phishingPayloadRepository = this.dbService.createRepository<IPhishingPayloadDocument>('phishingPayloads', phishingPayloadDbSchema);
     }
 }

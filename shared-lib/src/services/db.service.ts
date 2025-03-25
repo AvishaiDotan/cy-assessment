@@ -27,10 +27,11 @@ export class DbService {
 
   public static async init(user: string, password: string, dbName: string, fullConnectionString: string | null = null): Promise<DbService> {
     if (!DbService.instance) {
-        const connectionString = fullConnectionString ?? `mongodb+srv://${user}:${password}@cluster0.nfqmr.mongodb.net/${dbName}?retryWrites=true&w=majority&appName=Cluster0`
+      // First try to use MONGODB_URI if available
+      const connectionString = process.env.MONGODB_URI || fullConnectionString || `mongodb://${user}:${password}@mongodb:27017/${dbName}?authSource=admin`;
 
       if (!connectionString) {
-        throw new Error("DB_CONNECTION_STRING must be defined in environment variables or config");
+        throw new Error("MONGODB_URI must be defined in environment variables or provide connection details");
       }
 
       DbService.instance = new DbService(connectionString);

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { DbService } from '../../services/db/db.service';
 import { IPhishingPayload } from '@avishaidotan/shared-lib';
 import axios from 'axios';
@@ -9,6 +9,7 @@ dotenv.config();
 
 @Injectable()
 export class SimulationsService {
+    private readonly logger = new Logger(SimulationsService.name);
     private phishingServerUrl: string;
 
     constructor(private readonly dbService: DbService) {
@@ -17,19 +18,39 @@ export class SimulationsService {
     }
 
     public async getAll(id: any): Promise<IPhishingPayload[]> {
-        const simulations = await this.dbService.phishingPayloadRepository.find({ userId: id });
-        const data = simulations.map(simulation => ({...(simulation as any)._doc, user: undefined}));
-        return data;
+        try {
+            
+            if (!id) {
+                this.logger.error('User ID is undefined or null');
+                throw new Error('User ID is required');
+            }
+
+            // Convert id to string if it's not already
+            const userId = id.toString();
+            
+            const query = { userId: userId };
+            
+            const simulations = await this.dbService.phishingPayloadRepository.find(query);
+            
+            const data = simulations.map(simulation => {
+                const doc = (simulation as any)._doc;
+                return { ...doc, user: undefined };
+            });
+            
+            return data;
+        } catch (error) {
+            throw error;
+        }
     }
 
     public async insert(payload: IPhishingPayload) {
         try {
-            console.log(`Sending phishing email to ${this.phishingServerUrl}/phishing/send`);
             const response = await axios.post(`${this.phishingServerUrl}/phishing/send`, payload);
             return response.data;
         } catch (error) {
-            console.error(`Failed to send phishing email: ${error.message}`);
-            throw new Error(`Failed to send phishing email: ${error.message}`);
+            this.logger.error(`Failed to process simulation: ${error.message}`);
+            this.logger.error(`Stack trace: ${error.stack}`);
+            throw new Error(`Failed to process simulation: ${error.message}`);
         }
     }
 }

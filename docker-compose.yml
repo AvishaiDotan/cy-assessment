@@ -1,6 +1,20 @@
 version: '3.8'
 
 services:
+  # MongoDB service
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=avishaidotan
+      - MONGO_INITDB_ROOT_PASSWORD=2P7dKjFyW2JruDMn
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+    restart: unless-stopped
+
   # Frontend application
   frontend:
     build:
@@ -12,6 +26,8 @@ services:
       - "5000:5000"
     environment:
       - NODE_ENV=production
+    networks:
+      - app-network
     restart: unless-stopped
 
   # Phishing Attempts Management Server
@@ -25,10 +41,10 @@ services:
       - JWT_SECRET=cymulate
       - PORT=3000
       - NODE_ENV=development
-      - DB_USER=avishaidotan
-      - DB_USER_PASSWORD=2P7dKjFyW2JruDMn
-      - DB_NAME=cymulate
+      - MONGODB_URI=mongodb://avishaidotan:2P7dKjFyW2JruDMn@mongodb:27017/cymulate?authSource=admin
       - FRONTEND_URL=http://localhost:5000
+    networks:
+      - app-network
     restart: unless-stopped
 
   # Phishing Simulation Server
@@ -41,16 +57,19 @@ services:
     environment:
       - PORT=7000
       - NODE_ENV=development
-      - DB_USER=avishaidotan
-      - DB_USER_PASSWORD=2P7dKjFyW2JruDMn
-      - DB_NAME=cymulate
+      - MONGODB_URI=mongodb://avishaidotan:2P7dKjFyW2JruDMn@mongodb:27017/cymulate?authSource=admin
       - SMTP_HOST=smtp.gmail.com
       - SMTP_PORT=587
       - SMTP_USER=avishaidotan@gmail.com
       - SMTP_PASS=ughw agba ghcj nmhs
       - SMTP_FROM=avishaidotan@gmail.com
+    networks:
+      - app-network
     restart: unless-stopped
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  mongodb_data:

@@ -92,21 +92,32 @@ export class EmailService {
     }
 
     private async prepareAndUpdatePayload(payload: IPhishingPayload) {
+        console.log('[EmailService] Starting payload preparation for recipient:', payload.recipient);
         payload.link = "temp";
+        console.log('[EmailService] Creating initial payload in database');
         const insertedPayload = await this.dbService.phishingPayloadRepository.create(payload);
         
         const extractedResult = (insertedPayload as any)._doc;
+        console.log('[EmailService] Payload created with ID:', extractedResult._id);
+        
         extractedResult.link = `http://localhost:7000/phishing/${extractedResult._id}/token/${extractedResult.userId}`;
+        console.log('[EmailService] Generated phishing link:', extractedResult.link);
+        
+        console.log('[EmailService] Updating payload with final link');
         await this.dbService.phishingPayloadRepository.updateOne(
             { _id: insertedPayload._id },
             { $set: { link: extractedResult.link } }
         );
+        console.log('[EmailService] Payload preparation completed successfully');
         return extractedResult;
     }
 
     public async sendEmail(payload: IPhishingPayload) {
         try {
+            console.log('[EmailService] Starting email sending process for recipient:', payload.recipient);
             const preparedPayload = await this.prepareAndUpdatePayload(payload);
+            
+            console.log('[EmailService] Preparing email with content length:', preparedPayload.emailContent.length);
             const mailOptions = {
                 from: process.env.SMTP_FROM || 'noreply@example.com',
                 to: preparedPayload.recipient,
@@ -114,10 +125,20 @@ export class EmailService {
                 html: this.createEmailTemplate(preparedPayload.emailContent, preparedPayload.link),
             };
 
+            console.log('[EmailService] Attempting to send email via SMTP');
             const info = await this.transporter.sendMail(mailOptions);
-            console.log('Email sent successfully:', info.messageId);
+            console.log('[EmailService] Email sent successfully:', {
+                messageId: info.messageId,
+                recipient: preparedPayload.recipient,
+                response: info.response
+            });
             return info;
         } catch (error) {
+            console.error('[EmailService] Failed to send email:', {
+                error: error.message,
+                stack: error.stack,
+                recipient: payload.recipient
+            });
             throw new HttpException(
                 error.message || 'Failed to send phishing email',
                 HttpStatus.INTERNAL_SERVER_ERROR
