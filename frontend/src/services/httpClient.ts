@@ -10,8 +10,6 @@ if (import.meta.env.MODE === 'production') {
   apiUrl = 'http://localhost:3000';
 }
 
-console.log('Environment:', import.meta.env.MODE);
-console.log('API URL:', apiUrl);
 
 class HttpClient {
   private client: AxiosInstance;

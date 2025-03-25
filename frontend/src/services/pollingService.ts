@@ -12,7 +12,6 @@ class PollingService {
       const data = await simulationsService.getAllSimulations();
       this.notifySubscribers(data, false); // Notify with data and that polling has ended
     } catch (error) {
-      console.error('Polling error:', error);
       this.notifySubscribers([], false); // Notify that polling has ended even on error
     }
   }
