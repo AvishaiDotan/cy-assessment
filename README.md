@@ -21,7 +21,7 @@ docker-compose up
 ```
 
 ### Required Environment Variables for Docker
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file in the root directory with the following variables OR update docker-compose file:
 
 ```env
 # MongoDB Configuration
