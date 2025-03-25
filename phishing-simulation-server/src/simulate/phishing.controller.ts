@@ -1,7 +1,15 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Get, Param, UseGuards, Req } from '@nestjs/common';
 import { IPhishingPayload } from 'shared-lib';
-import { EmailService } from '../services/email/email.service';
-import { DbService } from '../services/db/db.service';
+import { EmailService } from '../services/email.service';
+import { DbService } from '../services/db.service';
+import { TokenGuard } from '../services/auth/token.guard';
+import { JwtPayload } from 'jsonwebtoken';
+import { Request } from 'express';
+
+interface RequestWithPhishingPayload extends Request {
+    phishingPayload: IPhishingPayload;
+}
+
 @Controller('phishing')
 export class PhishingController {
     constructor(private readonly emailService: EmailService, private readonly dbService: DbService) {}
@@ -13,7 +21,7 @@ export class PhishingController {
             const insertedPayload = await this.dbService.phishingPayloadRepository.create(payload);
             
             const extractedResult = (insertedPayload as any)._doc;
-            extractedResult.link = `http://localhost:7000/validate/${extractedResult._id}`;
+            extractedResult.link = `http://localhost:7000/phishing/${extractedResult._id}`;
             const result = await this.emailService.sendEmail(extractedResult);
             return result;
         } catch (error) {
@@ -24,12 +32,18 @@ export class PhishingController {
         }
     }
 
-    @Get('validate/:id')
-    async validatePhishingEmail(@Param('id') id: string) {
-        const payload = await this.dbService.phishingPayloadRepository.findById(id);
-        const extractedResult = ((payload as any)._doc) as IPhishingPayload
-        extractedResult.status = "GOOD"
-        await this.dbService.phishingPayloadRepository.updateOne(extractedResult)
-        return payload;
+    @Get(':id/token/:token')
+    @UseGuards(TokenGuard)
+    async validatePhishingEmail(@Req() request: any) {
+        const phishingPayload = request.phishingPayload;
+        
+        // Update payload status
+        phishingPayload.status = "valid";
+
+        await this.dbService.phishingPayloadRepository.updateOne(
+            { _id: phishingPayload._id },
+            { $set: { status: "valid" } }
+        );
+        return phishingPayload;
     }
 }

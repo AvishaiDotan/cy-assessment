@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { IPhishingPayload } from 'shared-lib';
-import { DbService } from '../db/db.service';
-
+import { DbService } from '../services/db.service'
 @Injectable()
 export class EmailService {
     /**
