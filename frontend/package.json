@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "watch": "vite build --watch"
+    "watch": "vite build --watch",
+    "dev-production": "vite --mode production"
   },
   "dependencies": {
     "@avishaidotan/npm-test": "^1.0.2",
