@@ -1,13 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 // Choose API URL based on environment
-let apiUrl: string;
-if (import.meta.env.MODE === 'production') {
-  apiUrl = import.meta.env.VITE_PRODUCTION_API_URL;
-} else {
-  apiUrl = import.meta.env.VITE_DEVELOPMENT_API_URL;
-}
-
+let apiUrl = import.meta.env.API;
 class HttpClient {
   private client: AxiosInstance;
 

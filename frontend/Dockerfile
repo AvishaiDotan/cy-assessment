@@ -2,32 +2,13 @@ FROM node:18-alpine as build
 
 WORKDIR /app
 
-# Copy package.json and install dependencies
 COPY package*.json ./
 RUN npm install
 
 COPY . .
 
-ARG NODE_ENV=production
-ENV VITE_API_URL=http://server:3000
+RUN mkdir -p frontend-dist
 
-
-# Build the frontend
 RUN npm run build
 
-# Use a lightweight HTTP server to serve the static content
-FROM node:18-alpine
-
-WORKDIR /app
-
-# Install serve globally
-RUN npm install -g serve
-
-# Copy built frontend from the build stage
-COPY --from=build /app/dist /app
-
-# Expose the port
-EXPOSE 5000
-
-# Start the server
-CMD ["serve", "-s", ".", "-l", "5000"] 
+RUN cp -R dist/* frontend-dist/

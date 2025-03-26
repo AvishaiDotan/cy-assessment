@@ -2,20 +2,30 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import * as cookieParser from 'cookie-parser';
-import { Logger } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 dotenv.config();
 
+console.log('Testing');
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: ['error']
-  });
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+    process.env.NODE_ENV === 'test'
+      ? {
+          logger: ['error'],
+        }
+      : {},
+  );
   app.use(cookieParser());
-  app.enableCors({
-    origin: [process.env.FRONTEND_URL, 'http://localhost:5173'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    credentials: true
-  });
-  await app.listen(process.env.PORT!);
+  
+  if (process.env.NODE_ENV === 'development') {
+    app.enableCors({
+      origin: [process.env.FRONTEND_URL!],
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+      credentials: true,
+    });
+  }
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
