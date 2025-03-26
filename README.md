@@ -15,17 +15,72 @@
 ## Quick Deployment
 
 ### Option 1: Docker (Recommended)
+
+1. First, copy the docker-compose example file:
 ```bash
-# Start all services
-docker-compose up
+cp docker-compose.example.yml docker-compose.yml
 ```
 
-### Required Environment Variables for Docker
-Create a `.env` file in the root directory with the following variables OR update docker-compose file:
+2. Update the MongoDB credentials in `docker-compose.yml`:
+```yaml
+x-mongodb-credentials:
+  MONGO_INITDB_ROOT_USERNAME: your_mongodb_username
+  MONGO_INITDB_ROOT_PASSWORD: your_mongodb_password
+  MONGO_DB_NAME: your_database_name
+```
+
+3. Create environment files for each service:
+   - Copy `.env.example` to `.env` in `./phishing-attempts-management-server/`
+   - Copy `.env.example` to `.env` in `./phishing-simulation-server/`
+
+4. Start the services:
+```bash
+docker-compose up -d
+```
+
+### Access Points For Docker
+- Management API: http://localhost:3000
+- Simulation API: http://localhost:7000
+- MongoDB: mongodb://localhost:27017
+
+### Option 2: Manual Setup
+
+1. **Prerequisites**
+   - Node.js (v16 or higher)
+   - MongoDB (v4.4 or higher)
+   - npm or yarn
+
+2. **MongoDB Setup**
+   ```bash
+   # Start MongoDB (if not running as a service)
+   mongod --dbpath /path/to/data/db
+   ```
+
+3. **Management Server Setup**
+   ```bash
+   cd phishing-attempts-management-server
+   npm install
+   cp .env.example .env
+   # Update .env with your configuration
+   npm run start:dev
+   ```
+
+4. **Simulation Server Setup**
+   ```bash
+   cd phishing-simulation-server
+   npm install
+   cp .env.example .env
+   # Update .env with your configuration
+   npm run start:dev
+   ```
+
+### Required Environment Variables
+
+For both Docker and manual deployment, you need to configure the following environment variables:
 
 ```env
 # MongoDB Configuration
-MONGODB_URI=mongodb://mongodb:27017/cymulate
+MONGODB_URI=mongodb://username:password@localhost:27017/database_name?authSource=admin
 
 # JWT Configuration
 JWT_SECRET=your_jwt_secret_here
@@ -39,44 +94,11 @@ SMTP_PASS=your_app_specific_password
 SMTP_FROM=your_email@gmail.com
 
 # Server Ports
-FRONTEND_PORT=5000
-MANAGEMENT_SERVER_PORT=3001
+MANAGEMENT_SERVER_PORT=3000
 SIMULATION_SERVER_PORT=7000
 ```
 
 > **Note**: For Gmail, you'll need to use an App Password instead of your regular password. Generate one in your Google Account settings under Security > 2-Step Verification > App passwords.
-
-### Option 2: Manual Setup
-```bash
-# 1. Install Dependencies
-cd phishing-attempts-management-server && npm install
-cd ../phishing-simulation-server && npm install
-cd ../frontend && npm install
-
-# 2. Configure Environment
-# Copy .env.example to .env in each service directory
-
-# 3. Start Services
-# Terminal 1 - Management Server
-cd phishing-attempts-management-server
-npm run start:dev
-
-# Terminal 2 - Simulation Server
-cd phishing-simulation-server
-npm run start:dev
-
-# Terminal 3 - Frontend
-cd frontend
-npm run dev
-```
-
-### Access Points For Docker
-- Frontend: http://localhost:5000
-- Management API: http://localhost:3001
-- Simulation API: http://localhost:7000
-- MongoDB: mongodb://localhost:27017
-
-
 
 ## Project Overview
 

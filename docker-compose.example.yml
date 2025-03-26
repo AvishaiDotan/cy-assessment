@@ -1,85 +1,70 @@
-version: '3.8'
+# Docker Compose for Cymulate Application
+
+# MongoDB credentials configuration
+x-mongodb-credentials: &mongodb-credentials
+  MONGO_INITDB_ROOT_USERNAME: your_mongodb_username
+  MONGO_INITDB_ROOT_PASSWORD: your_mongodb_password
+  MONGO_PORT: 27017
+  MONGO_DB_NAME: your_database_name
+
+# Base environment variables for all services
+x-app-base-env: &app-base-env
+  NODE_ENV: production
+  MONGODB_URI: mongodb://your_mongodb_username:your_mongodb_password@mongodb:27017/your_database_name?authSource=admin
+  # Service-to-service communication URLs
+  SIMULATION_SERVER_URL: http://phishing-server:7000
+  MANAGEMENT_SERVER_URL: http://phishing-management-app:3000
 
 services:
-  # MongoDB service
   mongodb:
     image: mongo:latest
     ports:
       - "27017:27017"
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=your_mongodb_username
-      - MONGO_INITDB_ROOT_PASSWORD=your_mongodb_password
+      <<: *mongodb-credentials
     volumes:
       - mongodb_data:/data/db
     networks:
       - app-network
     restart: unless-stopped
 
-  # Frontend application
-  frontend:
+  phishing-management-app:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - NODE_ENV=production
+      context: .
+      dockerfile: main-server.dockerfile
     ports:
-      - "5000:5000"
+      - "3000:3000"
+    env_file:
+      - ./phishing-attempts-management-server/.env
     environment:
-      - NODE_ENV=production
+      <<: *app-base-env
+    restart: unless-stopped
     networks:
       - app-network
-    restart: unless-stopped
-    depends_on:
-      - server
-
-  # Phishing Attempts Management Server
-  server:
-    build:
-      context: ./phishing-attempts-management-server
-      dockerfile: Dockerfile
-    ports:
-      - "3001:3000"
-    environment:
-      - JWT_SECRET=your_jwt_secret
-      - PORT=3000
-      - NODE_ENV=development
-      - MONGODB_URI=mongodb://your_mongodb_username:your_mongodb_password@mongodb:27017/cymulate?authSource=admin
-      - FRONTEND_URL=http://localhost:5000
-      - PHISHING_SERVER_URL=http://phishing-server:7000
-    networks:
-      - app-network
-    restart: unless-stopped
     depends_on:
       - mongodb
+      - phishing-server
 
-  # Phishing Simulation Server
   phishing-server:
     build:
       context: ./phishing-simulation-server
       dockerfile: Dockerfile
     ports:
       - "7000:7000"
+    env_file:
+      - ./phishing-simulation-server/.env
     environment:
-      - PORT=7000
-      - NODE_ENV=development
-      - MONGODB_URI=mongodb://your_mongodb_username:your_mongodb_password@mongodb:27017/cymulate?authSource=admin
-      - JWT_SECRET=your_jwt_secret
-      - SMTP_HOST=smtp.example.com
-      - SMTP_PORT=587
-      - SMTP_USER=your_email@example.com
-      - SMTP_PASS=your_email_password
-      - SMTP_FROM=noreply@example.com
+      <<: *app-base-env
+      PORT: 7000
     networks:
       - app-network
     restart: unless-stopped
     depends_on:
       - mongodb
 
-# Define the network for communication between services
 networks:
   app-network:
     driver: bridge
 
-# Define the volume for persistent MongoDB data
 volumes:
-  mongodb_data: 
+  mongodb_data:

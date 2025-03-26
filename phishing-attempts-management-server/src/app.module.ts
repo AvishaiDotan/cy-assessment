@@ -9,7 +9,7 @@ import { join } from 'path';
     AuthModule, 
     SimulationsModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      rootPath: join(__dirname, 'dist', '..', 'public'),
     }),
   ],
 })

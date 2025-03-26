@@ -1,16 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 // Choose API URL based on environment
-let apiUrl: string;
-if (import.meta.env.MODE === 'production') {
-  // In production mode, use port 3001
-  apiUrl = 'http://localhost:3001';
-} else {
-  // In development mode, use port 3000
-  apiUrl = 'http://localhost:3000';
-}
-
-
+let apiUrl = import.meta.env.API;
 class HttpClient {
   private client: AxiosInstance;
 
@@ -21,6 +12,7 @@ class HttpClient {
       headers: {
         'Content-Type': 'application/json',
       },
+
     });
   }
 
