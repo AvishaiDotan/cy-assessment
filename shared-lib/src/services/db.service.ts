@@ -1,4 +1,3 @@
-import * as dotenv from "dotenv";
 import mongoose, {
   Document,
   Model,
@@ -6,8 +5,6 @@ import mongoose, {
   FilterQuery,
   UpdateQuery,
 } from "mongoose";
-
-dotenv.config();
 
 export interface DbConfig {
   connectionString: string;
@@ -25,10 +22,8 @@ export class DbService {
     this.connectionString = connectionString;
   }
 
-  public static async init(user: string, password: string, dbName: string, fullConnectionString: string | null = null): Promise<DbService> {
+  public static async init(connectionString: string): Promise<DbService> {
     if (!DbService.instance) {
-      // First try to use MONGODB_URI if available
-      const connectionString = process.env.MONGODB_URI || fullConnectionString || `mongodb://${user}:${password}@mongodb:27017/${dbName}?authSource=admin`;
 
       if (!connectionString) {
         throw new Error("MONGODB_URI must be defined in environment variables or provide connection details");

@@ -9,6 +9,8 @@ import {
   HttpStatus,
   BadRequestException,
   InternalServerErrorException,
+  Put,
+  Param,
 } from '@nestjs/common';
 import { IPhishingPayload } from '@avishaidotan/shared-lib';
 import { SimulationsService } from './simulations.service';
@@ -50,11 +52,41 @@ export class SimulationsController {
 
       payload.userId = req.user._id.toString();
       const result = await this.simulationsService.insert(payload);
-      return { success: true, data: result };
+      return result._doc;
     } catch (error) {
       this.logger.error(
         `POST /simulations - Error creating simulation: ${error.message}`,
       );
+      throw new InternalServerErrorException(
+        'An unexpected error occurred while processing your request. Please try again later.',
+      );
+    }
+  }
+
+  @Put(':userId/token/:tokenId')
+  async visitPhishingLink(
+    @Param('userId') userId: string,
+    @Param('tokenId') tokenId: string,
+  ) {
+    try {
+      if (!userId || !tokenId) {
+        this.logger.warn(
+          `Invalid request parameters - userId: ${userId}, tokenId: ${tokenId}`,
+        );
+        throw new BadRequestException('Missing required parameters');
+      }
+
+      const result = await this.simulationsService.visitPhishingLink(
+        userId,
+        tokenId,
+      );
+      return result;
+    } catch (error) {
+      this.logger.error(
+        `Failed to process phishing link visit: ${error.message}`,
+        error.stack,
+      );
+
       throw new InternalServerErrorException(
         'An unexpected error occurred while processing your request. Please try again later.',
       );

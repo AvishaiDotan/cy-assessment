@@ -4,6 +4,7 @@ import { Login } from './components/Login';
 import { Signup } from './components/Signup';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Home } from './components/Home';
+import { LandingLink } from './components/LandingLink';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/visited/:userId/token/:tokenId" element={<LandingLink />} />
           <Route
             path="/"
             element={

@@ -6,7 +6,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 dotenv.config();
 
-console.log('Testing');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
@@ -19,7 +18,7 @@ async function bootstrap() {
   );
   app.use(cookieParser());
   
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV !== 'production' && process.env.FRONTEND_URL) {
     app.enableCors({
       origin: [process.env.FRONTEND_URL!],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],

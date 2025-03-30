@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: 'dist', //'../phishing-attempts-management-server/dist/public',
+    outDir: 'dist', 
     emptyOutDir: true,
   },
 })

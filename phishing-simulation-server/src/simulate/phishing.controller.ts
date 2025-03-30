@@ -2,13 +2,10 @@ import {
   Controller,
   Post,
   Body,
-  HttpException,
-  HttpStatus,
-  Get,
-  Param,
   UseGuards,
   Req,
   InternalServerErrorException,
+  Put,
 } from '@nestjs/common';
 import { IPhishingPayload } from '@avishaidotan/shared-lib';
 import { EmailService } from '../services/email.service';
@@ -36,31 +33,41 @@ export class PhishingController {
         error.stack,
       );
 
-      // Log specific error cases but don't expose them to the user
       if (error.code === 'ECONNREFUSED') {
         this.logger.error('SMTP connection refused - server unavailable');
       } else if (error.code === 'EAUTH') {
         this.logger.error('SMTP authentication failed - invalid credentials');
       }
 
-      // Always throw a generic error to the user
       throw new InternalServerErrorException(
         'Failed to send phishing email. Please try again later.',
       );
     }
   }
 
-  @Get(':id/token/:token')
+  @Put(':id/token/:token')
   @UseGuards(TokenGuard)
   async validatePhishingEmail(@Req() request: any) {
-    const phishingPayload = request.phishingPayload;
+    try {
+      const phishingPayload = request.phishingPayload;
 
-    phishingPayload.status = 'valid';
+      phishingPayload.status = 'valid';
 
-    await this.dbService.phishingPayloadRepository.updateOne(
-      { _id: phishingPayload._id },
-      { $set: { status: 'valid' } },
-    );
-    return phishingPayload;
+      const updateResult = await this.dbService.phishingPayloadRepository.updateOne(
+        { _id: phishingPayload._id },
+        { $set: { status: 'valid' } },
+      );
+
+      return phishingPayload;
+    } catch (error) {
+      this.logger.error(
+        `Failed to validate phishing email: ${error.message}`,
+        error.stack,
+      );
+      
+      throw new InternalServerErrorException(
+        'Failed to validate phishing email. Please try again later.',
+      );
+    }
   }
 }

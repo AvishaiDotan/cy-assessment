@@ -18,7 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const location = useLocation();
 
     useEffect(() => {
-        if (location.pathname === '/') {
+        if (location.pathname === '/' || location.pathname.startsWith('/visited')) {
             checkUser();
         } else {
             setLoading(false);

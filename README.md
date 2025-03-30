@@ -14,9 +14,11 @@
 
 ## Quick Deployment
 
+There are two ways to deploy the Cymulate Phishing Simulation Platform:
+
 ### Option 1: Docker (Recommended)
 
-1. First, copy the docker-compose example file:
+1. Copy the docker-compose example file:
 ```bash
 cp docker-compose.example.yml docker-compose.yml
 ```
@@ -29,11 +31,23 @@ x-mongodb-credentials:
   MONGO_DB_NAME: your_database_name
 ```
 
-3. Create environment files for each service:
-   - Copy `.env.example` to `.env` in `./phishing-attempts-management-server/`
-   - Copy `.env.example` to `.env` in `./phishing-simulation-server/`
+3. Create environment files for each service by copying the example files:
+```bash
+cp phishing-attempts-management-server/.env.example phishing-attempts-management-server/.env
+cp phishing-simulation-server/.env.example phishing-simulation-server/.env
+cp frontend/.env.example frontend/.env
+```
 
-4. Start the services:
+> **Note**: If there is no `.env.example` for a service, it means the base file doesn't include any secrets.
+
+4. Update the .env files with your real environment variables.
+
+5. Start the services using the rebuild-and-run.sh script:
+```bash
+chmod +x rebuild-and-run.sh && ./rebuild-and-run.sh
+```
+
+Alternatively, you can use docker-compose directly:
 ```bash
 docker-compose up -d
 ```
@@ -41,38 +55,50 @@ docker-compose up -d
 ### Access Points For Docker
 - Management API: http://localhost:3000
 - Simulation API: http://localhost:7000
+- Frontend: http://localhost:3000
 - MongoDB: mongodb://localhost:27017
 
-### Option 2: Manual Setup
+### Option 2: Manual Setup with Node.js
 
 1. **Prerequisites**
    - Node.js (v16 or higher)
    - MongoDB (v4.4 or higher)
    - npm or yarn
 
-2. **MongoDB Setup**
+2. **Environment Setup**
+   - Copy each .env.example to .env and update with your configuration:
    ```bash
-   # Start MongoDB (if not running as a service)
-   mongod --dbpath /path/to/data/db
+   cp frontend/.env.example frontend/.env
+   cp phishing-attempts-management-server/.env.example phishing-attempts-management-server/.env
+   cp phishing-simulation-server/.env.example phishing-simulation-server/.env
    ```
 
-3. **Management Server Setup**
+3. **MongoDB Connection**
+   - Ensure you have a MongoDB instance running
+   - Set the `EXTERNAL_MONGODB_URI` in both server .env files
+
+4. **Frontend Setup**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev  # Runs on port 5173
+   ```
+
+5. **Management Server Setup**
    ```bash
    cd phishing-attempts-management-server
    npm install
-   cp .env.example .env
-   # Update .env with your configuration
    npm run start:dev
    ```
 
-4. **Simulation Server Setup**
+6. **Simulation Server Setup**
    ```bash
    cd phishing-simulation-server
    npm install
-   cp .env.example .env
-   # Update .env with your configuration
    npm run start:dev
    ```
+
+> **Note**: The shared library is hosted on npm servers and is automatically installed as a dependency when needed.
 
 ### Required Environment Variables
 
@@ -81,24 +107,25 @@ For both Docker and manual deployment, you need to configure the following envir
 ```env
 # MongoDB Configuration
 MONGODB_URI=mongodb://username:password@localhost:27017/database_name?authSource=admin
+EXTERNAL_MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@cluster0.example.mongodb.net/DBNAME
 
 # JWT Configuration
 JWT_SECRET=your_jwt_secret_here
-JWT_EXPIRATION=24h
 
 # SMTP Configuration (for sending emails)
-SMTP_HOST=smtp.gmail.com
+SMTP_HOST=smtp.example.com
 SMTP_PORT=587
-SMTP_USER=your_email@gmail.com
-SMTP_PASS=your_app_specific_password
-SMTP_FROM=your_email@gmail.com
+SMTP_USER=your_email@example.com
+SMTP_PASS=your_email_password
+SMTP_FROM=noreply@example.com
 
 # Server Ports
-MANAGEMENT_SERVER_PORT=3000
-SIMULATION_SERVER_PORT=7000
-```
+PORT=3000 # Management server
+PORT=7000 # Simulation server
 
-> **Note**: For Gmail, you'll need to use an App Password instead of your regular password. Generate one in your Google Account settings under Security > 2-Step Verification > App passwords.
+# Frontend Configuration
+VITE_API=http://localhost:3000
+```
 
 ## Project Overview
 
@@ -139,11 +166,7 @@ cymulate/
 └── docker-compose.yml          # Docker configuration
 ```
 
-### Environment Setup
-1. Copy `.env.example` to `.env` in each service
-2. Configure MongoDB connection
-3. Set up email credentials
-4. Configure JWT secrets
+> **Note**: The shared library is hosted on npm servers and is automatically installed as a dependency when needed.
 
 ## API Reference
 
