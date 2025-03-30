@@ -2,6 +2,10 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 // Choose API URL based on environment
 let apiUrl = import.meta.env.API;
+if (import.meta.env.MODE === 'development') {
+  apiUrl = 'http://localhost:3000';
+}
+
 class HttpClient {
   private client: AxiosInstance;
 

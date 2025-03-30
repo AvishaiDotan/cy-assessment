@@ -19,16 +19,16 @@ export class DbService implements OnModuleInit{
         this.logger.log(`Starting database initialization in ${isDevelopment ? 'development' : 'production'} mode`);
         
         try {
-            if (isDevelopment) {
+            if (
+                process.env.NODE_ENV === 'development' &&
+                process.env.EXTERNAL_MONGODB_URI
+              ) {
                 this.dbService = await SharedDbService.init(
-                    process.env.DB_USERNAME!,
-                    process.env.DB_PASSWORD!,
-                    process.env.DB_NAME!,
-                    null
+                  process.env.EXTERNAL_MONGODB_URI!,
                 );
-            } else {
-                this.dbService = await SharedDbService.init('', '', '', process.env.MONGODB_URI || null);
-            }
+              } else {
+                this.dbService = await SharedDbService.init(process.env.MONGODB_URI!);
+              }
             
             this.phishingPayloadRepository = this.dbService.createRepository<IPhishingPayloadDocument>('phishingPayloads', phishingPayloadDbSchema);
             this.logger.log('Successfully initialized phishing payload repository');

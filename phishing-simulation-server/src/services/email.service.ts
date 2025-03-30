@@ -32,43 +32,85 @@ export class EmailService {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Important Message</title>
                 <style>
+                    :root {
+                        --white: #FFFFFFff;
+                        --ghost-white: #F1F2FBff;
+                        --international-klein-blue: #4029A4ff;
+                        --white-2: #FFFFFFff;
+                        --white-3: #FEFEFEff;
+                        --periwinkle: #BAB5E2ff;
+                        --black: #000000ff;
+                        --white-4: #FFFFFFff;
+                        --tropical-indigo: #9A74F3ff;
+                        --white-5: #FFFFFFff;
+                    }
+                    
                     body {
                         font-family: Arial, sans-serif;
                         line-height: 1.6;
-                        color: #333;
+                        color: var(--black);
                         margin: 0;
                         padding: 0;
+                        background-color: var(--ghost-white);
                     }
                     .container {
                         max-width: 600px;
-                        margin: 0 auto;
-                        padding: 20px;
-                        background-color: #ffffff;
+                        margin: 20px auto;
+                        padding: 0;
+                        background-color: var(--white);
+                        border-radius: 12px;
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                        overflow: hidden;
                     }
                     .header {
-                        background-color: #f8f9fa;
-                        padding: 20px;
+                        background: linear-gradient(135deg, var(--international-klein-blue), var(--tropical-indigo));
+                        padding: 30px 20px;
                         text-align: center;
-                        border-bottom: 1px solid #dee2e6;
+                        color: var(--white);
+                    }
+                    .header h2 {
+                        margin: 0;
+                        font-size: 28px;
+                        font-weight: 600;
+                        letter-spacing: 0.5px;
                     }
                     .content {
-                        padding: 20px;
+                        padding: 30px;
+                        background-color: var(--white-3);
                     }
                     .button {
                         display: inline-block;
-                        padding: 12px 24px;
-                        background-color: #007bff;
-                        color: #ffffff;
+                        padding: 16px 32px;
+                        background: linear-gradient(135deg, var(--international-klein-blue), var(--tropical-indigo));
+                        color: var(--white);
                         text-decoration: none;
-                        border-radius: 4px;
-                        margin: 20px 0;
+                        border-radius: 8px;
+                        margin: 25px 0;
+                        font-weight: 600;
+                        font-size: 16px;
+                        transition: transform 0.2s ease, box-shadow 0.2s ease;
+                        box-shadow: 0 4px 6px rgba(64, 41, 164, 0.2);
+                    }
+                    .button:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 12px rgba(64, 41, 164, 0.3);
+                    }
+                    .button-container {
+                        text-align: center;
+                        margin: 30px 0;
                     }
                     .footer {
                         text-align: center;
-                        padding: 20px;
-                        font-size: 12px;
-                        color: #6c757d;
-                        border-top: 1px solid #dee2e6;
+                        padding: 25px;
+                        font-size: 13px;
+                        color: var(--periwinkle);
+                        background-color: var(--ghost-white);
+                        border-top: 1px solid rgba(186, 181, 226, 0.3);
+                    }
+                    .content p {
+                        margin-bottom: 20px;
+                        color: var(--black);
+                        font-size: 16px;
                     }
                 </style>
             </head>
@@ -79,8 +121,8 @@ export class EmailService {
                     </div>
                     <div class="content">
                         ${content}
-                        <div style="text-align: center;">
-                            <a href="${link}" class="button">Please visit this link</a>
+                        <div class="button-container">
+                            <a href="${link}" class="button">Click Here to Continue</a>
                         </div>
                     </div>
                     <div class="footer">
@@ -99,8 +141,8 @@ export class EmailService {
             
             const extractedResult = (insertedPayload as any)._doc;
             
-            const baseUrl = process.env.NODE_ENV! === 'development' ? process.env.PHISHING_SERVER_URL_DEV! : process.env.PHISHING_SERVER_URL!;
-            extractedResult.link = `${baseUrl}${extractedResult._id}/token/${extractedResult.userId}`;
+            const baseUrl = process.env.NODE_ENV! === 'development' && process.env.FRONTEND_URL ? process.env.FRONTEND_URL! : process.env.IP!;
+            extractedResult.link = `${baseUrl}/visited/${extractedResult._id}/token/${extractedResult.userId}`;
             
             await this.dbService.phishingPayloadRepository.updateOne(
                 { _id: insertedPayload._id },

@@ -16,10 +16,14 @@ dotenv.config();
 export class SimulationsService {
   private readonly logger = new Logger(SimulationsService.name);
 
-  constructor(private readonly dbService: DbService) {}
+  private PHISHING_SERVER_URL: string | null = null;
+  constructor(private readonly dbService: DbService) {
+    this.PHISHING_SERVER_URL = this.getPhishingServerUrl();
+  }
 
   private getPhishingServerUrl(): string {
-    return process.env.NODE_ENV === 'development'
+    return process.env.NODE_ENV === 'development' &&
+      process.env.PHISHING_SERVER_URL_DEV
       ? process.env.PHISHING_SERVER_URL_DEV!
       : process.env.PHISHING_SERVER_URL!;
   }
@@ -55,10 +59,15 @@ export class SimulationsService {
 
   public async insert(payload: IPhishingPayload) {
     try {
-      const phishingServerUrl = this.getPhishingServerUrl();
+      if (!this.PHISHING_SERVER_URL) {
+        this.logger.error('Phishing server URL is not set');
+        throw new InternalServerErrorException(
+          'Phishing server URL is not set',
+        );
+      }
 
       const response = await axios.post(
-        `${phishingServerUrl}/phishing/send`,
+        `${this.PHISHING_SERVER_URL}/phishing/send`,
         payload,
       );
       return response.data;
@@ -69,7 +78,33 @@ export class SimulationsService {
           error.stack,
         );
       }
-      
+
+      throw new InternalServerErrorException(
+        'An unexpected error occurred while processing your request. Please try again later.',
+      );
+    }
+  }
+
+  public async visitPhishingLink(
+    userId: string,
+    tokenId: string,
+  ): Promise<boolean> {
+    try {
+      if (!this.PHISHING_SERVER_URL) {
+        this.logger.error('Phishing server URL is not set');
+        throw new InternalServerErrorException(
+          'Phishing server URL is not set',
+        );
+      }
+
+      const response = await axios.put(
+        `${this.PHISHING_SERVER_URL}/phishing/${userId}/token/${tokenId}`,
+      );
+
+      return true;
+    } catch (error) {
+      this.logger.error('Failed to visit phishing link', JSON.stringify(error))
+
       throw new InternalServerErrorException(
         'An unexpected error occurred while processing your request. Please try again later.',
       );
