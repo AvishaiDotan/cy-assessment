@@ -8,9 +8,9 @@ import {
   Put,
 } from '@nestjs/common';
 import { IPhishingPayload } from '@avishaidotan/shared-lib';
-import { EmailService } from '../services/email.service';
-import { DbService } from '../services/db.service';
-import { TokenGuard } from '../services/auth/token.guard';
+import { EmailService } from '../../services/email.service';
+import { DbService } from '../../services/db.service';
+import { TokenGuard } from '../../guards/token.guard';
 import { Logger } from '@nestjs/common';
 
 @Controller('phishing')
@@ -49,9 +49,9 @@ export class PhishingController {
   @UseGuards(TokenGuard)
   async validatePhishingEmail(@Req() request: any) {
     try {
-      const phishingPayload = request.phishingPayload;
+      const phishingPayload = request.phishingPayload as IPhishingPayload;
 
-      phishingPayload.status = 'valid';
+      phishingPayload.status = 'visited';
 
       const updateResult = await this.dbService.phishingPayloadRepository.updateOne(
         { _id: phishingPayload._id },

@@ -24,12 +24,6 @@ export class DbService implements OnModuleInit {
   }
 
   private async initDb() {
-    this.logger.log('NODE_ENV', process.env.NODE_ENV);
-    this.logger.log('EXTERNAL_MONGODB_URI', process.env.EXTERNAL_MONGODB_URI);
-    this.logger.log('MONGODB_URI', process.env.MONGODB_URI);
-    console.log('MONGODB_URI', process.env.MONGODB_URI);
-    console.log('EXTERNAL_MONGODB_URI', process.env.EXTERNAL_MONGODB_URI);
-    console.log('NODE_ENV', process.env.NODE_ENV);
     try {
       if (
         process.env.NODE_ENV === 'development' &&

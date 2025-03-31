@@ -4,12 +4,14 @@ export interface IPhishingPayload {
   _id?: mongoose.Types.ObjectId;
   recipient: string;
   emailContent: string;
-  status: string;
+  status: PhishingPayloadStatus;
   link: string;
   createdAt?: Date;
   updatedAt?: Date;
   userId?: any;
 }
+
+export type PhishingPayloadStatus = "pending" | "visited";
 
 export const phishingPayloadDbSchema = new mongoose.Schema<IPhishingPayload>(
   {
@@ -43,7 +45,7 @@ export interface IPhishingPayloadDocument extends mongoose.Document {
   _id: mongoose.Types.ObjectId;
   recipient: string;
   emailContent: string;
-  status: string;
+  status: PhishingPayloadStatus;
   link: string;
   createdAt: Date;
   updatedAt: Date;

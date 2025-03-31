@@ -4,15 +4,15 @@ import { IPhishingPayload } from '@avishaidotan/shared-lib';
 class PollingService {
   private interval: NodeJS.Timeout | null = null;
   private subscribers: ((data: IPhishingPayload[], isPolling: boolean) => void)[] = [];
-  private readonly POLL_INTERVAL = 5000; // 5 seconds
+  private readonly POLL_INTERVAL = 5000; 
 
   private async poll() {
     try {
-      this.notifySubscribers([], true); // Notify that polling has started
+      this.notifySubscribers([], true); 
       const data = await simulationsService.getAllSimulations();
-      this.notifySubscribers(data, false); // Notify with data and that polling has ended
+      this.notifySubscribers(data, false); 
     } catch (error) {
-      this.notifySubscribers([], false); // Notify that polling has ended even on error
+      this.notifySubscribers([], false); 
     }
   }
 
