@@ -47,7 +47,7 @@ export const SimulationsTable: React.FC<SimulationsTableProps> = ({
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{simulation.recipient}</td>
                     <td className="px-6 py-4 text-sm text-gray-300 max-w-xs truncate">{simulation.emailContent?.substring(0, 50)}...</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {simulation.status === 'pending' ? 'Pending' : simulation.status}
+                      {simulation.status === 'pending' ? 'Pending' : 'Visited'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{simulation.link}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">

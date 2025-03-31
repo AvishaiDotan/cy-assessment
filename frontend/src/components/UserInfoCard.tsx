@@ -2,7 +2,7 @@ import { IUser } from '@avishaidotan/shared-lib';
 import React from 'react';
 
 interface UserInfoCardProps {
-  user: IUser;
+  user: IUser | null;
 }
 
 export const UserInfoCard: React.FC<UserInfoCardProps> = ({ user }) => {
