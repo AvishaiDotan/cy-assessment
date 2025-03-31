@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@avishaidotan/npm-test": "^1.0.2",
-    "@avishaidotan/shared-lib": "^1.0.0",
+    "@avishaidotan/shared-lib": "^1.1.0",
     "axios": "^1.8.3",
     "dotenv": "^16.4.7",
     "react": "^19.0.0",

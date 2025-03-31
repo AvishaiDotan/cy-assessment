@@ -1,5 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext, BadRequestException, UnauthorizedException, Logger } from '@nestjs/common';
-import { DbService } from '../db.service';
+import { DbService } from '../services/db.service';
 import { IPhishingPayload } from '@avishaidotan/shared-lib';
 
 @Injectable()
@@ -32,7 +32,7 @@ export class TokenGuard implements CanActivate {
 
             const extractedResult = ((isValidForUser as any)._doc) as IPhishingPayload;
             
-            if (extractedResult.status === "valid") {
+            if (extractedResult.status === 'visited') {
                 throw new BadRequestException("Link has already been validated");
             }
             
