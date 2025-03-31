@@ -1,7 +1,8 @@
+import { IUser } from '@avishaidotan/shared-lib';
 import React from 'react';
 
 interface UserInfoCardProps {
-  user: any;
+  user: IUser;
 }
 
 export const UserInfoCard: React.FC<UserInfoCardProps> = ({ user }) => {
