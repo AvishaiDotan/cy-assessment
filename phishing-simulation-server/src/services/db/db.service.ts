@@ -10,8 +10,8 @@ export class DbService implements OnModuleInit{
     public phishingPayloadRepository: DbRepository<IPhishingPayloadDocument>;
     private readonly logger = new Logger(DbService.name);
     
-    onModuleInit() {
-        this.initDb();
+    async onModuleInit() {
+        await this.initDb();
     }
 
     private async initDb() {

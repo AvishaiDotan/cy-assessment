@@ -3,6 +3,7 @@ import { AuthModule } from './controllers/auth/auth.module';
 import { SimulationsModule } from './controllers/simulations/simulations.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { DbModule } from './services/db/db.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { join } from 'path';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, 'dist', '..', 'public'),
     }),
+    DbModule,
   ],
 })
 export class AppModule {}
