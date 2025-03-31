@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
+import { Injectable, OnModuleInit, Logger, Scope } from '@nestjs/common';
 import {
   DbService as SharedDbService,
   DbRepository,
@@ -12,6 +12,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+
 @Injectable()
 export class DbService implements OnModuleInit {
   private readonly logger = new Logger(DbService.name);
@@ -19,11 +20,14 @@ export class DbService implements OnModuleInit {
   public usersRepository: DbRepository<IUserDocument>;
   public phishingPayloadRepository: DbRepository<IPhishingPayloadDocument>;
 
-  onModuleInit() {
-    this.initDb();
+
+
+  async onModuleInit() {
+    await this.initDb();
   }
 
   private async initDb() {
+    
     try {
       if (
         process.env.NODE_ENV === 'development' &&

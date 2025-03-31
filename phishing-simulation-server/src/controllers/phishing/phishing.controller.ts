@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { IPhishingPayload } from '@avishaidotan/shared-lib';
 import { EmailService } from '../../services/email.service';
-import { DbService } from '../../services/db.service';
+import { DbService } from '../../services/db/db.service';
 import { TokenGuard } from '../../guards/token.guard';
 import { Logger } from '@nestjs/common';
 
@@ -55,7 +55,7 @@ export class PhishingController {
 
       const updateResult = await this.dbService.phishingPayloadRepository.updateOne(
         { _id: phishingPayload._id },
-        { $set: { status: 'valid' } },
+        { $set: { status: phishingPayload.status } },
       );
 
       return phishingPayload;

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { PhishingModule } from './controllers/phishing/phishing.module';
 import { EmailService } from './services/email.service'
-import { DbService } from './services/db.service';
+import { DbModule } from './services/db/db.module';
 
 @Module({
-  imports: [PhishingModule],
+  imports: [PhishingModule, DbModule],
   controllers: [],
-  providers: [EmailService, DbService],
+  providers: [EmailService],
 })
 export class AppModule {}

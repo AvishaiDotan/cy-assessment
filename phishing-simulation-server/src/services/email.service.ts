@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { IPhishingPayload } from '@avishaidotan/shared-lib';
-import { DbService } from '../services/db.service';
+import { DbService } from './db/db.service';
 import * as nodemailer from 'nodemailer';
 import * as dotenv from 'dotenv';
 

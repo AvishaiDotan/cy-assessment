@@ -4,7 +4,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { DbService } from '../../services/db.service';
+import { DbService } from '../../services/db/db.service';
 import { IPhishingPayload } from '@avishaidotan/shared-lib';
 import axios from 'axios';
 import * as dotenv from 'dotenv';

@@ -1,5 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext, BadRequestException, UnauthorizedException, Logger } from '@nestjs/common';
-import { DbService } from '../services/db.service';
+import { DbService } from '../services/db/db.service';
 import { IPhishingPayload } from '@avishaidotan/shared-lib';
 
 @Injectable()
